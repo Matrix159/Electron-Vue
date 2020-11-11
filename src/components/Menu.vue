@@ -17,13 +17,15 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
+// @ts-ignore
+window.ipcRenderer.invoke('perform-action', {});
+
 export default defineComponent({
   name: 'Menu',
   props: {
     msg: String,
   },
 });
-console.log(process.platform);
 </script>
 <style scoped lang="scss">
   @import '../styles/colors.scss';

@@ -1,6 +1,7 @@
-import { app, protocol, BrowserWindow, Menu } from 'electron';
+import { app, protocol, BrowserWindow } from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
+import path from 'path';
 
 let window;
 
@@ -22,6 +23,7 @@ async function createWindow() {
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: (process.env
         .ELECTRON_NODE_INTEGRATION as unknown) as boolean,
+      preload: path.join(__dirname, '../src/preload.js'),
     },
     autoHideMenuBar: true
   });
@@ -56,15 +58,16 @@ app.on('activate', () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
+
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {
-      await installExtension(VUEJS_DEVTOOLS);
+      await installExtension(VUEJS_DEVTOOLS, true);
     } catch (e) {
       console.error('Vue Devtools failed to install:', e.toString());
     }
   }
-  createWindow();
+  await createWindow();
 });
 
 // Exit cleanly on request from parent process in development mode.
