@@ -1,6 +1,8 @@
-import { app, protocol, BrowserWindow } from 'electron';
+import {
+  app, protocol, BrowserWindow, ipcMain,
+} from 'electron';
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib';
-import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer';
+import installExtension from 'electron-devtools-installer';
 import path from 'path';
 
 let window;
@@ -17,7 +19,7 @@ async function createWindow() {
   window = new BrowserWindow({
     width: 1920,
     height: 1080,
-    title: "The Electric Vuegaloo",
+    title: 'The Electric Vuegaloo',
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
@@ -25,7 +27,7 @@ async function createWindow() {
         .ELECTRON_NODE_INTEGRATION as unknown) as boolean,
       preload: path.join(__dirname, '../src/preload.js'),
     },
-    autoHideMenuBar: true
+    autoHideMenuBar: true,
   });
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
@@ -58,11 +60,14 @@ app.on('activate', () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
-
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {
-      await installExtension(VUEJS_DEVTOOLS, true);
+      // Install VueJS 3 Dev Tools
+      await installExtension({
+        id: 'ljjemllljcmogpfapbkkighbhhppjdbg',
+        electron: '>=1.2.1',
+      });
     } catch (e) {
       console.error('Vue Devtools failed to install:', e.toString());
     }
@@ -84,3 +89,5 @@ if (isDevelopment) {
     });
   }
 }
+
+ipcMain.handle('get-os', async (event, ...args) => process.platform);

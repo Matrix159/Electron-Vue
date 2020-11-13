@@ -18,7 +18,7 @@
 import { defineComponent } from 'vue';
 
 // @ts-ignore
-window.ipcRenderer.invoke('perform-action', {});
+window.ipcRenderer.invoke('get-os').then((result) => console.log(result));
 
 export default defineComponent({
   name: 'Menu',

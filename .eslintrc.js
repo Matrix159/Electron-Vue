@@ -16,7 +16,7 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'linebreak-style': [0],
     'max-len': 'off',
-    'import/no-extraneous-dependencies': ['error', {'devDependencies': true}],
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     '@typescript-eslint/ban-ts-ignore': 'off',
   },
 };
