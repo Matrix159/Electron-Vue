@@ -6,6 +6,7 @@
     <div class="play" v-else @click="buttonClick()">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24px" height="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M8 5v14l11-7z"/></svg>
     </div>
+    <input type="range" min="1" max="100" value="50" class="slider" id="myRange" @input="volumeChange($event.target.value)">
   </div>
 </template>
 
@@ -31,6 +32,10 @@ export default defineComponent({
       console.log('button click');
       this.socket.emit('play-pause', { playing: this.playing });
       this.playing = !this.playing;
+    },
+    volumeChange(volume: number) {
+      console.log(volume);
+      this.socket.emit('volume-change', volume);
     },
   },
   beforeMount() {
@@ -73,7 +78,7 @@ export default defineComponent({
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 200px;
+    height: 400px;
     background-color: $background-secondary;
 
     .play, .pause {
