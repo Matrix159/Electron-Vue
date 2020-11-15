@@ -18,7 +18,12 @@ export default defineComponent({
   data() {
     return {
       playing: false,
-      socket: io('eldridge-pi.ddns.net:3000'),
+      // socket: io('eldridge-pi.ddns.net:3000'),
+      socket: io(process.env.VUE_APP_SOCKET_DOMAIN as string, {
+        query: `token=${localStorage.getItem('token')}`,
+      }).on('error', (error: SocketIOClient.Manager) => {
+        console.error(`IO Error: ${JSON.stringify(error)}`);
+      }),
     };
   },
   methods: {
@@ -27,6 +32,25 @@ export default defineComponent({
       this.socket.emit('play-pause', { playing: this.playing });
       this.playing = !this.playing;
     },
+  },
+  beforeMount() {
+    this.socket.on('authorized', (msg: any) => {
+      console.log('Authenticated token');
+    });
+    this.socket.on('unauthorized', (msg: any) => {
+      console.log(`unauthorized: ${JSON.stringify(msg.data)}`);
+      throw new Error(msg.data.type);
+    });
+    /* this.socket.on('connect', () => {
+      this.socket
+        .on('authenticated', () => {
+          console.log('Authenticated token');
+        })
+        .on('unauthorized', (msg: any) => {
+          console.log(`unauthorized: ${JSON.stringify(msg.data)}`);
+          throw new Error(msg.data.type);
+        });
+    }); */
   },
   mounted() {
     this.socket.on('message', (info: any) => {

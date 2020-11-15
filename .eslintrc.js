@@ -18,5 +18,6 @@ module.exports = {
     'max-len': 'off',
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     '@typescript-eslint/ban-ts-ignore': 'off',
+    '@typescript-eslint/no-explicit-any': 'off'
   },
 };

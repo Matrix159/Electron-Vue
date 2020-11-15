@@ -40,6 +40,8 @@ export default defineComponent({
   props: {
     msg: String,
   },
+  mounted() {
+  }
 });
 </script>
 
