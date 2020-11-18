@@ -7,18 +7,23 @@
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24px" height="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M8 5v14l11-7z"/></svg>
     </div>
     <input type="range" min="1" max="100" value="50" class="slider" id="myRange" @input="volumeChange($event.target.value)">
+    <WatchList/>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import io from 'socket.io-client';
+import WatchList from '@/components/WatchList.vue';
+import IOEvents from '@/models/events';
 
 export default defineComponent({
   name: 'DiscordController',
+  components: {
+    WatchList,
+  },
   data() {
     return {
-      playing: false,
       // socket: io('eldridge-pi.ddns.net:3000'),
       socket: io(process.env.VUE_APP_SOCKET_DOMAIN as string, {
         query: `token=${localStorage.getItem('token')}`,
@@ -27,44 +32,30 @@ export default defineComponent({
       }),
     };
   },
+  computed: {
+    playing() {
+      return this.$store.state.musicController.playing;
+    },
+  },
   methods: {
     buttonClick() {
       console.log('button click');
-      this.socket.emit('play-pause', { playing: this.playing });
-      this.playing = !this.playing;
+      this.socket.emit(IOEvents.PLAY_PAUSE, { playing: this.playing });
+      this.$store.commit('playing', !this.playing);
     },
     volumeChange(volume: number) {
       console.log(volume);
-      this.socket.emit('volume-change', volume);
+      this.socket.emit(IOEvents.VOLUME_CHANGE, volume);
     },
   },
-  beforeMount() {
-    this.socket.on('authorized', (msg: any) => {
-      console.log('Authenticated token');
-    });
-    this.socket.on('unauthorized', (msg: any) => {
-      console.log(`unauthorized: ${JSON.stringify(msg.data)}`);
-      throw new Error(msg.data.type);
-    });
-    /* this.socket.on('connect', () => {
-      this.socket
-        .on('authenticated', () => {
-          console.log('Authenticated token');
-        })
-        .on('unauthorized', (msg: any) => {
-          console.log(`unauthorized: ${JSON.stringify(msg.data)}`);
-          throw new Error(msg.data.type);
-        });
-    }); */
-  },
   mounted() {
-    this.socket.on('message', (info: any) => {
+    this.socket.on(IOEvents.MESSAGE, (info: any) => {
       console.log('message');
       console.log(info);
     });
-    this.socket.on('music-start', () => {
+    this.socket.on(IOEvents.MUSIC_START, () => {
       console.log('music-start');
-      this.playing = true;
+      this.$store.commit('playing', true);
     });
     console.log('mounted');
   },
@@ -78,7 +69,7 @@ export default defineComponent({
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 400px;
+    height: 100%;
     background-color: $background-secondary;
 
     .play, .pause {

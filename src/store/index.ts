@@ -1,19 +1,34 @@
 import { createStore } from 'vuex';
 
+interface State {
+  count: number;
+  loggedIn: boolean;
+  musicController: {
+    volume: number;
+    playing: boolean;
+  };
+}
+
 export default createStore({
-  state: {
-    count: 0,
-    loggedIn: false,
+  state() {
+    return {
+      count: 0,
+      loggedIn: false,
+      musicController: {
+        volume: 100,
+        playing: false,
+      },
+    };
   },
   mutations: {
-    increment(state) {
-      state.count += 1;
-    },
-    login(state) {
+    login(state: State) {
       state.loggedIn = true;
     },
-    logout(state) {
+    logout(state: State) {
       state.loggedIn = false;
+    },
+    playing(state: State, playing: boolean) {
+      state.musicController.playing = playing;
     },
   },
   actions: {
