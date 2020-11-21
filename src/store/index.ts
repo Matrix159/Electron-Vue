@@ -4,8 +4,10 @@ interface State {
   count: number;
   loggedIn: boolean;
   musicController: {
-    volume: number;
-    playing: boolean;
+    [guildId: string]: {
+      volume: number;
+      playing: boolean;
+    };
   };
 }
 
@@ -14,10 +16,7 @@ export default createStore({
     return {
       count: 0,
       loggedIn: false,
-      musicController: {
-        volume: 100,
-        playing: false,
-      },
+      musicController: {},
     };
   },
   mutations: {
@@ -27,8 +26,18 @@ export default createStore({
     logout(state: State) {
       state.loggedIn = false;
     },
-    playing(state: State, playing: boolean) {
-      state.musicController.playing = playing;
+    playing(state: State, event: { guildId: string; playing: boolean }) {
+      const guildState = { ...state.musicController[event.guildId], playing: event.playing };
+      state.musicController = { ...state.musicController, [event.guildId]: guildState };
+    },
+    musicStart(state: State, event: { guildId: string }) {
+      state.musicController = {
+        ...state.musicController,
+        [event.guildId]: {
+          playing: true,
+          volume: 100,
+        },
+      };
     },
   },
   actions: {
