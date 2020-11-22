@@ -9,6 +9,13 @@
         <span>{{user.username}}</span>
       </div>
     </div>
+    <div class="queue-container">
+      <label>
+        Queue
+        <input type="text" v-model="queueInput"/>
+      </label>
+      <button @click="queueSong(queueInput)">Submit</button>
+    </div>
     <div v-if="selectedGuildId" class="music-container">
       <div class="pause" v-if="playing" @click="musicButtonClick()">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24px" height="24px"><path d="M0 0h24v24H0z" fill="none"/><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
@@ -40,6 +47,7 @@ export default defineComponent({
       }),
       creeperInfo: {} as CreeperInfo,
       selectedGuildId: '' as string,
+      queueInput: '',
     };
   },
   computed: {
@@ -63,6 +71,10 @@ export default defineComponent({
       console.log(volume);
       this.socket.emit(IOEvents.VOLUME_CHANGE, { guildId: this.selectedGuildId, volume });
     },
+    queueSong(input: string) {
+      this.socket.emit('queue', { guildId: this.selectedGuildId, songName: input });
+      this.queueInput = '';
+    },
   },
   mounted() {
     this.socket.on(IOEvents.MESSAGE, (creeperInfo: CreeperInfo) => {
@@ -85,7 +97,7 @@ export default defineComponent({
   .discord-controller {
     display: grid;
     grid-auto-rows: 1fr min-content;
-    grid-template-columns: min-content 1fr;
+    grid-template-columns: min-content 1fr 1fr;
     height: 100%;
     background-color: $background-secondary;
 
@@ -137,7 +149,7 @@ export default defineComponent({
 
     .music-container {
       grid-row: 2;
-      grid-column: 2;
+      grid-column: 2 / 4;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -156,6 +168,11 @@ export default defineComponent({
           border-color: #FFFFFF;
         }
       }
+    }
+
+    .queue-container {
+      grid-row: 1;
+      grid-column: 3;
     }
 
     svg {
